@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spin & Win Prize Wheel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a1a1a, #4d004d);
+      color: #fff;
+      text-align: center;
+      overflow-x: hidden;
+    }
+    h1 {
+      margin: 30px 20px;
+      font-size: 28px;
+      background: linear-gradient(90deg, #ff00cc, #3333ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 8px rgba(255,255,255,0.2);
+    }
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+    }
+    #wheel {
+      width: 100%;
+      height: 100%;
+      transition: transform 6s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+    #center-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 80px;
+      height: 80px;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border-radius: 50%;
+      box-shadow: 0 0 15px #ff33cc, 0 0 30px #6600ff;
+    }
+    #center-btn:hover {
+      transform: translate(-50%, -50%) scale(1.05);
+      box-shadow: 0 0 25px #ff33cc, 0 0 50px #6600ff;
+    }
+    #center-btn:active {
+      transform: translate(-50%, -50%) scale(0.95);
+    }
+    .btn {
+      display: inline-block;
+      margin: 15px;
+      padding: 14px 30px;
+      background: linear-gradient(45deg, #ff0066, #6600ff);
+      border: none;
+      border-radius: 50px;
+      color: #fff;
+      font-size: 17px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #ff33cc, 0 0 30px #6600ff;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #ff33cc, 0 0 50px #6600ff;
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    #message, #formSection {
+      margin: 20px;
+      display: none;
+      animation: fadeIn 1s forwards;
+    }
+    input[type="text"], input[type="tel"] {
+      width: 80%;
+      padding: 12px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      text-align: center;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    @media (max-width: 500px) {
+      .wheel-container {
+        width: 250px;
+        height: 250px;
+      }
+      #center-btn {
+        width: 65px;
+        height: 65px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Spin the Wheel & Win a Guaranteed Prize!</h1>
+
+  <div class="wheel-container">
+    <img src="spin.png" id="wheel" alt="Spin Wheel">
+    <img src="button.png" id="center-btn" alt="Spin Button" onclick="spin()">
+  </div>
+
+  <div id="message"></div>
+
+  <div id="formSection">
+    <p style="font-size: 18px;">To claim this prize, please fill your details and share with 10 friends on WhatsApp.</p>
+    <input type="text" id="name" placeholder="Your Name"><br>
+    <input type="tel" id="mobile" placeholder="Mobile Number"><br>
+    <button class="btn" onclick="share()">Share on WhatsApp</button>
+  </div>
+
+  <script>
+    const wheel = document.getElementById("wheel");
+    const message = document.getElementById("message");
+    const formSection = document.getElementById("formSection");
+
+    let winningPrize = "";
+
+    const prizes = [
+      "100 PayTM Cash",
+      "Movie Ticket",
+      "iPhone 14",
+      "Samsung TV",
+      "Smartwatch",
+      "Bluetooth Speaker",
+      "AirPods",
+      "Amazon Voucher ₹50",
+      "Free Coffee Coupon",
+      "20% Discount Voucher",
+      "Surprise Gift Box"
+    ];
+
+    function spin() {
+      message.style.display = "none";
+      formSection.style.display = "none";
+
+      const prizeIndex = Math.floor(Math.random() * prizes.length);
+      winningPrize = prizes[prizeIndex];
+
+      const anglePerSegment = 360 / 12;
+      const nonBetterLuckPositions = [...Array(12).keys()].filter(i => i !== 7);
+      const possiblePositions = nonBetterLuckPositions;
+
+      const finalAngle = 360 * 5 + (360 - (possiblePositions[prizeIndex] * anglePerSegment)) + (Math.random() * anglePerSegment);
+
+      wheel.style.transform = `rotate(${finalAngle}deg)`;
+
+      setTimeout(() => {
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+
+        message.innerHTML = `<h2>Congratulations! You won <span style="color:#ff66ff;">${winningPrize}</span></h2>`;
+        message.style.display = "block";
+        formSection.style.display = "block";
+      }, 6000);
+    }
+
+    function share() {
+      const name = document.getElementById("name").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+
+      if (name === "" || mobile === "") {
+        alert("Please enter your name and mobile number.");
+        return;
+      }
+
+      const text = encodeURIComponent(`Hey! I just won "${winningPrize}" on this Spin & Win game as ${name}! Try your luck too!`);
+      const url = `https://wa.me/?text=${text}`;
+      window.open(url, '_blank');
+
+      message.innerHTML = `<h2>Thank you, ${name}!</h2><p>Your prize claim for <strong>${winningPrize}</strong> has been submitted successfully.<br>Our team will contact you soon!</p>`;
+      formSection.style.display = "none";
+      message.style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
